@@ -197,11 +197,48 @@ body {
       border: 3px solid #888;
     }
     
-    #keyboard {
-      padding: 15px;
-      width: 100%;
-      max-width: 500px;
-    }
+    @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          padding-bottom: 20px;  /* Add extra space at bottom */
+        }
+        
+        h1 {
+          font-size: 36px;
+          margin-bottom: 15px;
+          letter-spacing: 2px;
+        }
+        
+        #game-board {
+          grid-template-columns: repeat(5, 55px);
+          grid-gap: 5px;
+          padding: 15px;
+        }
+        
+        .tile {
+          width: 55px;
+          height: 55px;
+          font-size: 28px;
+          border: 3px solid #888;
+        }
+        
+        #keyboard {
+          padding: 10px;
+          width: 100%;
+          max-width: 100%;  /* Use full width */
+          margin-bottom: 20px;  /* Add space at bottom */
+        }
+        
+        .key {
+          padding: 14px 6px;  /* Smaller padding */
+          min-width: 28px;  /* Smaller buttons */
+          font-size: 13px;
+        }
+        
+        .keyboard-row {
+          gap: 3px;  /* Tighter spacing */
+        }
+      }
     
     .key {
       padding: 14px 8px;
