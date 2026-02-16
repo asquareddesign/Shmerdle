@@ -1,59 +1,98 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     text-align: center;
-    background: #ffd9a8;   /* light orange */
-    color: #1e4ed8;        /* blue text */
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+    color: #f8fafc;
 }
-
 
 h1 {
     margin-top: 20px;
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #facc15;
+    text-shadow:
+        0 4px 0 #b45309,
+        0 8px 20px rgba(0,0,0,0.4);
 }
 
+/* BOARD */
 #game-board {
     display: grid;
-    grid-template-columns: repeat(5, 60px);
-    grid-gap: 5px;
+    grid-template-columns: repeat(5, 65px);
+    grid-gap: 6px;
     justify-content: center;
     margin-top: 30px;
 }
 
 .tile {
-    width: 60px;
-    height: 60px;
-    border: 2px solid #3a3a3c;
+    width: 65px;
+    height: 65px;
+    border: 2px solid #334155;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     text-transform: uppercase;
-    color: #1e4ed8;  /* blue letters */
+    background: #0f172a;
+    transition: all 0.3s ease;
 }
 
+/* POP animation when typing */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
 
+.tile.pop {
+  animation: pop 0.18s ease;
+}
 
+/* FLIP animation */
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+/* RESULT COLORS */
 .correct {
-    background: #6aaa64;
+    background: #22c55e;
+    border: none;
+    animation: flip 0.6s ease;
 }
 
 .present {
-    background: #c9b458;
+    background: #f59e0b;
+    border: none;
+    animation: flip 0.6s ease;
 }
 
 .absent {
-    background: #3a3a3c;
+    background: #475569;
+    border: none;
+    animation: flip 0.6s ease;
 }
 
+/* KEYBOARD */
 #keyboard {
     margin-top: 30px;
 }
 
 .key {
     display: inline-block;
-    padding: 10px;
-    margin: 3px;
-    background: #818384;
-    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 4px;
+    background: #334155;
+    border-radius: 6px;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.key:hover {
+    background: #475569;
+    transform: translateY(-2px);
 }
