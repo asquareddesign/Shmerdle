@@ -22,15 +22,27 @@ const words = [
     board.appendChild(tile);
   }
   
-  // Keyboard layout
-  const keys = [..."QWERTYUIOP","ASDFGHJKL","ENTER",..."ZXCVBNM","DEL"];
+  // Keyboard layout - FIXED
+  const keyboardRows = [
+    ["Q","W","E","R","T","Y","U","I","O","P"],
+    ["A","S","D","F","G","H","J","K","L"],
+    ["ENTER","Z","X","C","V","B","N","M","DEL"]
+  ];
   
-  keys.forEach(key => {
-    const keyBtn = document.createElement("div");
-    keyBtn.textContent = key;
-    keyBtn.classList.add("key");
-    keyBtn.addEventListener("click", () => handleKey(key));
-    keyboard.appendChild(keyBtn);
+  keyboardRows.forEach(row => {
+    const rowDiv = document.createElement("div");
+    rowDiv.classList.add("keyboard-row");
+    
+    row.forEach(key => {
+      const keyBtn = document.createElement("div");
+      keyBtn.textContent = key;
+      keyBtn.classList.add("key");
+      keyBtn.dataset.key = key;
+      keyBtn.addEventListener("click", () => handleKey(key));
+      rowDiv.appendChild(keyBtn);
+    });
+    
+    keyboard.appendChild(rowDiv);
   });
   
   // Allow physical keyboard input
@@ -76,7 +88,7 @@ const words = [
         const letter = guesses[r][c];
         tile.textContent = letter;
   
-        if (letter !== "") {
+        if (letter !== "" && r === currentRow && c === currentCol - 1) {
           tile.classList.add("pop");
           setTimeout(() => tile.classList.remove("pop"), 150);
         }
@@ -84,34 +96,62 @@ const words = [
     }
   }
   
-  // Reveal colors correctly and at right timing
+  // Reveal colors correctly with proper letter counting
   function checkGuess() {
     const guess = guesses[currentRow].join("").toLowerCase();
     if (guess.length !== 5) return;
   
     const tiles = document.querySelectorAll(".tile");
-    const rowToReveal = currentRow; // freeze row
+    const rowToReveal = currentRow;
+    
+    // Count letters in secret word for proper yellow/green logic
+    const letterCount = {};
+    for (let char of secretWord) {
+      letterCount[char] = (letterCount[char] || 0) + 1;
+    }
+    
+    const result = Array(5).fill("");
+    
+    // First pass: mark correct (green)
+    for (let i = 0; i < 5; i++) {
+      if (guess[i] === secretWord[i]) {
+        result[i] = "correct";
+        letterCount[guess[i]]--;
+      }
+    }
+    
+    // Second pass: mark present (yellow)
+    for (let i = 0; i < 5; i++) {
+      if (result[i] === "") {
+        if (letterCount[guess[i]] > 0) {
+          result[i] = "present";
+          letterCount[guess[i]]--;
+        } else {
+          result[i] = "absent";
+        }
+      }
+    }
   
+    // Animate tiles
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
         const tile = tiles[rowToReveal * 5 + i];
-  
-        tile.classList.remove("correct","present","absent");
-  
-        if (guess[i] === secretWord[i]) {
-          tile.classList.add("correct");
-        } else if (secretWord.includes(guess[i])) {
-          tile.classList.add("present");
-        } else {
-          tile.classList.add("absent");
-        }
+        tile.classList.add("flip");
+        
+        setTimeout(() => {
+          tile.classList.remove("correct","present","absent");
+          tile.classList.add(result[i]);
+          
+          // Update keyboard colors
+          updateKeyboard(guess[i].toUpperCase(), result[i]);
+        }, 250);
       }, i * 350);
     }
   
-    // move to next row AFTER reveal
+    // Move to next row AFTER reveal
     setTimeout(() => {
       if (guess === secretWord) {
-        alert("🎉 You won!");
+        setTimeout(() => alert("🎉 You won!"), 100);
         currentRow = 6;
         return;
       }
@@ -120,8 +160,19 @@ const words = [
       currentCol = 0;
   
       if (currentRow === 6) {
-        alert("Game over! The word was " + secretWord.toUpperCase());
+        setTimeout(() => alert("Game over! The word was " + secretWord.toUpperCase()), 100);
       }
     }, 5 * 350 + 100);
   }
   
+  function updateKeyboard(letter, status) {
+    const key = document.querySelector(`[data-key="${letter}"]`);
+    if (!key) return;
+    
+    // Don't downgrade correct to present or absent
+    if (key.classList.contains("correct")) return;
+    if (status === "present" && key.classList.contains("correct")) return;
+    
+    key.classList.remove("correct", "present", "absent");
+    key.classList.add(status);
+  }
